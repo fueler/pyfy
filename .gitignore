@@ -1,0 +1,6 @@
+__pycache__/
+.env
+
+# Google API specific files
+googleapi-credentials.json
+googleapi-token.json

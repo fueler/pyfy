@@ -1,6 +1,8 @@
 # pyfy
 Python Finance
 
+## Setup
+Store `SPREADSHEET_ID` in `.env` file where `SPREADSHEET_ID` is the Google Sheets' document id.
 
 ## VSCode Setup with Poetry
 Use `poetry env info --path` to get the path.
