@@ -11,9 +11,10 @@ DEFAULT_TOKEN_FILE = "googleapi-token.json"
 DEFAULT_CREDENTIALS_FILES = "googleapi-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
+
 def get_credentials(
-        cache_credentials: bool = True,
-        cached_token_filename: str | None = None) -> Credentials:
+    cache_credentials: bool = True, cached_token_filename: str | None = None
+) -> Credentials:
     credentials = None
     if cache_credentials:
         if not cached_token_filename:
@@ -25,8 +26,8 @@ def get_credentials(
             credentials.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                DEFAULT_CREDENTIALS_FILES,
-                SCOPES)
+                DEFAULT_CREDENTIALS_FILES, SCOPES
+            )
             credentials = flow.run_local_server(port=0)
         if cache_credentials:
             with open(cached_token_filename, "w") as token:
@@ -34,31 +35,32 @@ def get_credentials(
 
     return credentials
 
-def get_service(credentials : Credentials) -> Resource:
+
+def get_service(credentials: Credentials) -> Resource:
     try:
         service = build("sheets", "v4", credentials=credentials)
         return service.spreadsheets()
-        
+
     except HttpError as error:
         # TODO Log error
         return None
 
+
 def read_cell(
-        spreadsheet_id: str,
-        sheet_name: str,
-        column: str,
-        row: int,
-        credentials = None) -> str:
+    spreadsheet_id: str, sheet_name: str, column: str, row: int, credentials=None
+) -> str:
     if not credentials:
         credentials = get_credentials()
 
     try:
         sheets = get_service(credentials)
 
-        result = sheets.values().get(
-            spreadsheetId=spreadsheet_id,
-            range=f"{sheet_name}!{column}{row}").execute()
-        
+        result = (
+            sheets.values()
+            .get(spreadsheetId=spreadsheet_id, range=f"{sheet_name}!{column}{row}")
+            .execute()
+        )
+
         values = result.get("values", [])
 
         if not values:
@@ -66,6 +68,7 @@ def read_cell(
         return values[0][0]
     except HttpError as error:
         print(error)
+
 
 def test():
     from dotenv import load_dotenv
