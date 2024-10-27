@@ -2,10 +2,10 @@ import os
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore
+from googleapiclient.discovery import build  # type: ignore
 from googleapiclient.discovery import Resource
-from googleapiclient.errors import HttpError
+from googleapiclient.errors import HttpError  # type: ignore
 
 DEFAULT_TOKEN_FILE = "googleapi-token.json"
 DEFAULT_CREDENTIALS_FILES = "googleapi-credentials.json"
@@ -16,11 +16,11 @@ def get_credentials(
     cache_credentials: bool = True, cached_token_filename: str | None = None
 ) -> Credentials:
     credentials = None
+    if not cached_token_filename:
+        cached_token_filename = DEFAULT_TOKEN_FILE
     if cache_credentials:
-        if not cached_token_filename:
-            cached_token_filename = DEFAULT_TOKEN_FILE
-    if os.path.exists(cached_token_filename):
-        credentials = Credentials.from_authorized_user_file(cached_token_filename)
+        if os.path.exists(cached_token_filename):
+            credentials = Credentials.from_authorized_user_file(cached_token_filename)
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
@@ -48,7 +48,7 @@ def get_service(credentials: Credentials) -> Resource:
 
 def read_cell(
     spreadsheet_id: str, sheet_name: str, column: str, row: int, credentials=None
-) -> str:
+) -> str | None:
     if not credentials:
         credentials = get_credentials()
 
@@ -68,6 +68,7 @@ def read_cell(
         return values[0][0]
     except HttpError as error:
         print(error)
+        return None
 
 
 def test():
