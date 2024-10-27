@@ -6,7 +6,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-DEFAULT_TOKEN_FILE = "token.json"
+DEFAULT_TOKEN_FILE = "googleapi-token.json"
+DEFAULT_CREDENTIALS_FILES = "googleapi-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
 def get_credentials(
@@ -22,7 +23,9 @@ def get_credentials(
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                DEFAULT_CREDENTIALS_FILES,
+                SCOPES)
             credentials = flow.run_local_server(port=0)
         if cache_credentials:
             with open(cached_token_filename, "w") as token:
