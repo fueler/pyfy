@@ -42,7 +42,7 @@ def get_service(credentials: Credentials) -> Resource:
         return service.spreadsheets()
 
     except HttpError as error:
-        # TODO Log error
+        print(error)
         return None
 
 
