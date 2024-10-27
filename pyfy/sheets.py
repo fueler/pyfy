@@ -4,6 +4,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.discovery import Resource
 from googleapiclient.errors import HttpError
 
 DEFAULT_TOKEN_FILE = "googleapi-token.json"
@@ -12,7 +13,7 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
 def get_credentials(
         cache_credentials: bool = True,
-        cached_token_filename: str = None):
+        cached_token_filename: str | None = None) -> Credentials:
     credentials = None
     if cache_credentials:
         if not cached_token_filename:
@@ -33,7 +34,7 @@ def get_credentials(
 
     return credentials
 
-def get_service(credentials):
+def get_service(credentials : Credentials) -> Resource:
     try:
         service = build("sheets", "v4", credentials=credentials)
         return service.spreadsheets()
@@ -47,7 +48,7 @@ def read_cell(
         sheet_name: str,
         column: str,
         row: int,
-        credentials = None):
+        credentials = None) -> str:
     if not credentials:
         credentials = get_credentials()
 
@@ -60,8 +61,9 @@ def read_cell(
         
         values = result.get("values", [])
 
-        for row in values:
-            print(values)
+        if not values:
+            return None
+        return values[0][0]
     except HttpError as error:
         print(error)
 
@@ -71,4 +73,5 @@ def test():
     load_dotenv()
 
     SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
-    read_cell(SPREADSHEET_ID, "2024", "A", 1)
+    value = read_cell(SPREADSHEET_ID, "2024", "A", 1)
+    print(value)
